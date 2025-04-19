@@ -1,0 +1,80 @@
+import logging
+import pandas as pd
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from sqlalchemy import create_engine
+from datetime import datetime, timedelta
+
+# Constants
+POSTGRES_CONN_ID = "project_connection"
+SOURCE_TABLE = "sales_transformed_dag"
+DIM_PRODUCT_TABLE = "dim_product"
+
+def create_db_engine():
+    pg_hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
+    conn_str = pg_hook.get_uri()
+    engine = create_engine(conn_str, connect_args={"options": "-csearch_path=public"})
+    return engine
+
+def create_dim_product_table(engine):
+    query = f"""
+    CREATE TABLE IF NOT EXISTS {DIM_PRODUCT_TABLE} (
+        "Product ID" TEXT,
+        "Product Name" TEXT,
+        "Product Category" TEXT,
+        "Product Price" NUMERIC,
+        "File Name" TEXT,
+        "Load Date" DATE
+    );
+    """
+    with engine.begin() as connection:
+        connection.execute(query)
+    logging.info("✅ dim_product table created or already exists.")
+
+def load_dim_product():
+    engine = create_db_engine()
+    create_dim_product_table(engine)
+
+    # Extract all product data (no DISTINCT)
+    query = f"""
+        SELECT 
+            "Product ID", 
+            "Product Name", 
+            "Product Category",
+            "Product Price",
+            "File Name"
+        FROM {SOURCE_TABLE}
+        WHERE "Product ID" IS NOT NULL
+    """
+    df = pd.read_sql(query, engine)
+
+    # Add load date to all rows
+    df["Load Date"] = datetime.today().date()
+
+    # Load all rows (no upsert, just append)
+    df.to_sql(DIM_PRODUCT_TABLE, engine, if_exists="append", index=False)
+
+    logging.info("✅ dim_product table loaded with all rows (duplicates allowed).")
+
+# DAG Definition
+default_args = {
+    "owner": "airflow",
+    "start_date": datetime(2025, 4, 4),
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+}
+
+dag = DAG(
+    dag_id="dim_product",
+    default_args=default_args,
+    schedule_interval=None,
+    catchup=False,
+)
+
+load_dim_product_task = PythonOperator(
+    task_id="load_dim_product",
+    python_callable=load_dim_product,
+    execution_timeout=timedelta(minutes=15),
+    dag=dag,
+)
