@@ -6,7 +6,6 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from sqlalchemy import create_engine
 from datetime import datetime, timedelta
 
-# Constants
 POSTGRES_CONN_ID = "project_connection"
 SOURCE_TABLE = "sales_transformed_dag"
 DIM_SALES_REP_TABLE = "dim_sales_rep"
@@ -34,7 +33,6 @@ def load_dim_store():
     engine = create_db_engine()
     create_dim_sales_rep_table(engine)
 
-    # Extract all product data (no DISTINCT)
     query = f"""
         SELECT 
             "Sales Rep ID", 
@@ -45,15 +43,12 @@ def load_dim_store():
     """
     df = pd.read_sql(query, engine)
 
-    # Add load date to all rows
     df["Load Date"] = datetime.today().date()
 
-    # Load all rows (no upsert, just append)
     df.to_sql(DIM_SALES_REP_TABLE, engine, if_exists="append", index=False)
 
     logging.info("✅ dim_sales_rep table loaded with all rows (duplicates allowed).")
 
-# DAG Definition
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2025, 4, 7),
