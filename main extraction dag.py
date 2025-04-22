@@ -1,10 +1,8 @@
-# main_dag.py
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 from sub_module import extract_and_load
 
-# Default DAG arguments
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2025, 3, 22),
@@ -13,7 +11,6 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-# Define DAG
 dag = DAG(
     dag_id="sales_extraction",
     default_args=default_args,
@@ -21,7 +18,6 @@ dag = DAG(
     catchup=False,
 )
 
-# Define Task
 extract_load_task = PythonOperator(
     task_id="extract_and_load",
     python_callable=extract_and_load,
