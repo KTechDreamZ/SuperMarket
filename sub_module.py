@@ -1,10 +1,8 @@
-# sub_module.py
 import logging
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime
 import pandas as pd
 
-# Constants
 CSV_FILE_PATH = "/opt/airflow/data/sales_data.csv"
 POSTGRES_CONN_ID = "project_connection"
 TABLE_NAME = "sales_extraction_dag"
