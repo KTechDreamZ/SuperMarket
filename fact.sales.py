@@ -62,7 +62,6 @@ def load_fact_sales():
     df.to_sql(FACT_SALES_TABLE, engine, if_exists="append", index=False)
     logging.info("✅ fact_sales table loaded.")
 
-# DAG definition
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2025, 4, 4),
