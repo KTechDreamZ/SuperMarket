@@ -28,7 +28,7 @@ def create_dim_store_table(engine):
     """
     with engine.begin() as connection:
         connection.execute(query)
-    logging.info("✅ dim_store table created or already exists.")
+    logging.info(" dim_store table created or already exists.")
 
 def load_dim_store():
     engine = create_db_engine()
@@ -49,7 +49,7 @@ def load_dim_store():
 
     df.to_sql(DIM_STORE_TABLE, engine, if_exists="append", index=False)
 
-    logging.info("✅ dim_store table loaded with all rows (duplicates allowed).")
+    logging.info(" dim_store table loaded with all rows (duplicates allowed).")
 
 default_args = {
     "owner": "airflow",
