@@ -1,4 +1,3 @@
-# transform_module.py
 import logging
 import pandas as pd
 from airflow.providers.postgres.hooks.postgres import PostgresHook
