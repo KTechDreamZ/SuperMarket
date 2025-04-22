@@ -29,7 +29,7 @@ def create_dim_product_table(engine):
     """
     with engine.begin() as connection:
         connection.execute(query)
-    logging.info("✅ dim_product table created or already exists.")
+    logging.info(" dim_product table created or already exists.")
 
 def load_dim_product():
     engine = create_db_engine()
@@ -51,7 +51,7 @@ def load_dim_product():
 
     df.to_sql(DIM_PRODUCT_TABLE, engine, if_exists="append", index=False)
 
-    logging.info("✅ dim_product table loaded with all rows (duplicates allowed).")
+    logging.info(" dim_product table loaded with all rows (duplicates allowed).")
 
 default_args = {
     "owner": "airflow",
