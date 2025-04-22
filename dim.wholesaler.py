@@ -47,7 +47,6 @@ def load_dim_wholesaler():
     df.to_sql(DIM_WHOLESALER_TABLE, engine, if_exists="append", index=False)
     logging.info("✅ dim_wholesaler table loaded.")
 
-# DAG definition
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2025, 4, 4),
