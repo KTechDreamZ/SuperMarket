@@ -27,7 +27,7 @@ def create_dim_wholesaler_table(engine):
     """
     with engine.begin() as connection:
         connection.execute(query)
-    logging.info("✅ dim_wholesaler table created or already exists.")
+    logging.info(" dim_wholesaler table created or already exists.")
 
 def load_dim_wholesaler():
     engine = create_db_engine()
@@ -45,7 +45,7 @@ def load_dim_wholesaler():
     df["Load Date"] = datetime.today().date()
 
     df.to_sql(DIM_WHOLESALER_TABLE, engine, if_exists="append", index=False)
-    logging.info("✅ dim_wholesaler table loaded.")
+    logging.info(" dim_wholesaler table loaded.")
 
 default_args = {
     "owner": "airflow",
